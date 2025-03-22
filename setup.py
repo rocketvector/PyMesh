@@ -101,6 +101,16 @@ class cmake_build(build):
     def run(self):
         self.build_third_party()
         self.build_pymesh()
+        
+        # Fix incorrect output name
+        lib_dir = os.path.join("python", "pymesh", "lib")
+        old_path = os.path.join(lib_dir, "PyMeshNone")
+        new_path = os.path.join(lib_dir, "PyMesh.so")
+
+        if os.path.exists(old_path):
+            print(f"Renaming {old_path} -> {new_path}")
+            os.rename(old_path, new_path)
+
         build.run(self)
 
 setup(
