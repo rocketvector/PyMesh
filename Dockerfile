@@ -26,5 +26,7 @@ WORKDIR /pymesh
 
 COPY . .
 
+RUN python setup.py bdist_wheel
+
 # Default command (optional)
 CMD ["/bin/bash"]
