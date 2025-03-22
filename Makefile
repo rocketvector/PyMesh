@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 IMAGE_NAME = pymesh
 CONTAINER_NAME = pymesh_container
 DOCKERFILE = Dockerfile
