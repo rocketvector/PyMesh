@@ -16,7 +16,8 @@ RUN apt update -y \
     cmake
 
 USER spark
-WORKDIR /PyMesh
-COPY --chown=spark:spark . .
-RUN python setup.py clean \
+RUN mkdir /home/spark/PyMesh
+COPY --chown=spark:spark . /home/spark/PyMesh
+RUN cd /home/spark/PyMesh \
+    && python setup.py clean \
     && python setup.py bdist_wheel
