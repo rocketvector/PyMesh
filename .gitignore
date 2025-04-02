@@ -16,7 +16,6 @@ bin/
 swig/
 build/
 build_*/
-dist/
 python/pymesh/lib
 python/pymesh/swig
 python/pymesh/third_party/
