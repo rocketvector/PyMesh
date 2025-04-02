@@ -1,0 +1,39 @@
+# Makefile for building and pushing Docker image to GCP Artifact Registry
+SHELL := /bin/bash
+# Variables
+PROJECT_ID := rocketvector
+REGION := us
+REPOSITORY := docker
+IMAGE_NAME := pymesh-spark
+TAG ?= 0.0.1
+
+# Full image path
+IMAGE_URI := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/$(REPOSITORY)/$(IMAGE_NAME):$(TAG)
+LATEST_URI := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/$(REPOSITORY)/$(IMAGE_NAME):latest
+
+# Default target
+all: build push
+
+# Authenticate Docker with Artifact Registry
+auth:
+	gcloud auth configure-docker $(REGION)-docker.pkg.dev
+
+# Build Docker image
+build:
+	docker build -t $(IMAGE_URI) .
+	docker tag $(IMAGE_URI) $(LATEST_URI)
+
+# Push Docker image
+push:
+	docker push $(IMAGE_URI)
+	docker push $(LATEST_URI)
+
+# Clean local Docker image
+clean:
+	docker rmi $(IMAGE_URI) $(LATEST_URI)
+
+interactive:
+	docker run --rm -it $(IMAGE_URI) /bin/bash
+
+download:
+    docker run --rm -u $(id -u):$(id -g) -v "$(pwd)/dist:/output" $(IMAGE_URI) bash -c 'cp /PyMesh/dist/*.whl /output/'
