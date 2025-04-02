@@ -1,0 +1,41 @@
+FROM debian:11-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+USER root
+RUN apt update -y \
+    && apt install -y \
+    make \
+    libeigen3-dev \
+    libgmp-dev \
+    libgmpxx4ldbl \
+    libmpfr-dev \
+    libboost-dev \
+    libboost-thread-dev \
+    libtbb-dev \
+    python3-dev \
+    build-essential \
+    cmake \
+    nano \
+    vim \
+    wget
+
+ENV CONDA_HOME=/opt/miniconda3
+ENV PYSPARK_PYTHON=${CONDA_HOME}/bin/python
+ENV PATH=${CONDA_HOME}/bin:${PATH}
+RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-py311_25.1.1-2-Linux-x86_64.sh
+RUN bash Miniconda3-py311_25.1.1-2-Linux-x86_64.sh -b -p /opt/miniconda3 \
+    && ${CONDA_HOME}/bin/conda config --system --set always_yes True \
+    && ${CONDA_HOME}/bin/conda config --system --set auto_update_conda False \
+    && ${CONDA_HOME}/bin/conda config --system --prepend channels conda-forge \
+    && ${CONDA_HOME}/bin/conda config --system --set channel_priority strict \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh
+
+RUN groupadd -g 1099 spark
+RUN useradd -u 1099 -g 1099 -d /home/spark -m spark
+USER spark
+
+WORKDIR /PyMesh
+COPY --chown=spark:spark . .
+RUN python setup.py clean \
+    && python setup.py bdist_wheel
